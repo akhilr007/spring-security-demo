@@ -22,36 +22,36 @@ public class WebSecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
 
         httpSecurity
+                .csrf(csrfConfig -> csrfConfig.disable())
                 .authorizeHttpRequests(auth ->
                     auth
-                        .requestMatchers("/welcome").permitAll()
+                        .requestMatchers("/welcome", "/auth/**").permitAll()
                         .requestMatchers("/greet/**").hasAnyRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .csrf(csrfConfig -> csrfConfig.disable())
-                .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .formLogin(Customizer.withDefaults()); // if not using form, dont use csrf and session
+                .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+//                .formLogin(Customizer.withDefaults()); // if not using form, dont use csrf and session
 
         return httpSecurity.build();
     }
 
-    @Bean
-    UserDetailsService myInMemoryUserDetailsService(){
-
-        UserDetails adminUser = User
-                .withUsername("akhil")
-                .password(passwordEncoder().encode("test"))
-                .roles("ADMIN")
-                .build();
-
-        UserDetails user = User
-                .withUsername("anuj")
-                .password(passwordEncoder().encode("test"))
-                .roles("DRIVER")
-                .build();
-
-        return new InMemoryUserDetailsManager(adminUser, user);
-    }
+//    @Bean
+//    UserDetailsService myInMemoryUserDetailsService(){
+//
+//        UserDetails adminUser = User
+//                .withUsername("akhil")
+//                .password(passwordEncoder().encode("test"))
+//                .roles("ADMIN")
+//                .build();
+//
+//        UserDetails user = User
+//                .withUsername("anuj")
+//                .password(passwordEncoder().encode("test"))
+//                .roles("DRIVER")
+//                .build();
+//
+//        return new InMemoryUserDetailsManager(adminUser, user);
+//    }
 
     @Bean
     PasswordEncoder passwordEncoder(){
