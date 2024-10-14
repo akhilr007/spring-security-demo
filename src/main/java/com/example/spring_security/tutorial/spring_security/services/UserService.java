@@ -5,8 +5,10 @@ import com.example.spring_security.tutorial.spring_security.dto.SignupDTO;
 import com.example.spring_security.tutorial.spring_security.dto.UserDTO;
 import com.example.spring_security.tutorial.spring_security.models.User;
 import com.example.spring_security.tutorial.spring_security.repositories.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,6 +39,12 @@ public class UserService implements UserDetailsService {
                     )
         );
     }
+
+    public User getUserById(Long id){
+        return userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id"));
+    }
+
 
 
 }
