@@ -3,6 +3,7 @@ package com.example.spring_security.tutorial.spring_security.services;
 import com.example.spring_security.tutorial.spring_security.models.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class JwtService {
         return Keys.hmacShaKeyFor(jwtSecretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    private String generateToken(User user){
+    public String generateToken(User user){
 
         return Jwts.builder()
                 .subject(user.getId().toString())
