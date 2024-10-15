@@ -48,4 +48,9 @@ public class SessionService {
         sessionRepository.save(session);
 
     }
+
+    public void deleteSessionByToken(String refreshToken) {
+        sessionRepository.findByRefreshToken(refreshToken)
+                .ifPresent(sessionRepository::delete);
+    }
 }

@@ -5,6 +5,7 @@ import com.example.spring_security.tutorial.spring_security.dto.LoginResponseDTO
 import com.example.spring_security.tutorial.spring_security.dto.SignupDTO;
 import com.example.spring_security.tutorial.spring_security.dto.UserDTO;
 import com.example.spring_security.tutorial.spring_security.services.AuthService;
+import com.example.spring_security.tutorial.spring_security.services.SessionService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,6 +27,7 @@ import java.util.Arrays;
 public class AuthController {
 
     private final AuthService authService;
+    private final SessionService sessionService;
 
     @Value("${deploy.env}")
     private String deployEnv;
@@ -67,5 +69,31 @@ public class AuthController {
 
         LoginResponseDTO loginResponseDTO = authService.refreshToken(refreshToken);
         return ResponseEntity.ok(loginResponseDTO);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response){
+
+        String refreshToken = Arrays.stream(request.getCookies())
+                .filter(cookie -> "refreshToken".equals(cookie.getName()))
+                .findFirst()
+                .map(Cookie::getValue)
+                .orElseThrow(() ->
+                        new AuthenticationServiceException("Refresh Token not found in cookies")
+                );
+
+        sessionService.deleteSessionByToken(refreshToken);
+
+        Cookie accessToken = new Cookie("accessToken", null);
+        accessToken.setMaxAge(0); // This deletes the cookie
+        accessToken.setHttpOnly(true);
+        response.addCookie(accessToken);
+
+        Cookie refreshTokenCookie = new Cookie("refreshToken", null);
+        refreshTokenCookie.setMaxAge(0); // This deletes the cookie
+        refreshTokenCookie.setHttpOnly(true);
+        response.addCookie(refreshTokenCookie);
+
+        return ResponseEntity.ok("Logged out successfully");
     }
 }
