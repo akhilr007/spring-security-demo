@@ -39,11 +39,11 @@ public class WebSecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .oauth2Login(oauth2Config -> oauth2Config
-                        .failureUrl("/login?error=true")
-                        .successHandler(oAuth2SuccessHandler)
-                );
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+//                .oauth2Login(oauth2Config -> oauth2Config
+//                        .failureUrl("/login?error=true")
+//                        .successHandler(oAuth2SuccessHandler)
+//                );
 //                .formLogin(Customizer.withDefaults()); // if not using form, dont use csrf and session
 
         return httpSecurity.build();

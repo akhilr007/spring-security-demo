@@ -27,6 +27,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final UserService userService;
+    private final SessionService sessionService;
 
     public UserDTO signup(SignupDTO signupDTO) {
         Optional<User> user = userRepository.findByEmail(signupDTO.getEmail());
@@ -55,6 +56,8 @@ public class AuthService {
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
+        sessionService.generateNewSession(user, refreshToken);
+
         return LoginResponseDTO
                 .builder()
                 .id(user.getId())
@@ -66,6 +69,8 @@ public class AuthService {
     public LoginResponseDTO refreshToken(String refreshToken) {
 
         Long userId = jwtService.getUserIdFromToken(refreshToken);
+
+        sessionService.validateSession(refreshToken);
 
         User user = userService.getUserById(userId);
 
