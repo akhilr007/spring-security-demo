@@ -1,6 +1,7 @@
 package com.example.spring_security.tutorial.spring_security.config;
 
 import com.example.spring_security.tutorial.spring_security.filters.JwtAuthFilter;
+import com.example.spring_security.tutorial.spring_security.handlers.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +26,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
@@ -37,7 +39,11 @@ public class WebSecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .oauth2Login(oauth2Config -> oauth2Config
+                        .failureUrl("/login?error=true")
+                        .successHandler(oAuth2SuccessHandler)
+                );
 //                .formLogin(Customizer.withDefaults()); // if not using form, dont use csrf and session
 
         return httpSecurity.build();
