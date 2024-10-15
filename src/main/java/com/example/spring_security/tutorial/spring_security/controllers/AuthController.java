@@ -41,10 +41,15 @@ public class AuthController {
 
         LoginResponseDTO loginResponseDTO = authService.login(loginDTO);
 
-        Cookie cookie = new Cookie("refreshToken", loginResponseDTO.getRefreshToken());
-        cookie.setHttpOnly(true);
-        cookie.setSecure("production".equals(deployEnv));
-        response.addCookie(cookie);
+        Cookie accessToken = new Cookie("accessToken", loginResponseDTO.getAccessToken());
+        accessToken.setHttpOnly(true);
+        accessToken.setSecure("production".equals(deployEnv));
+        response.addCookie(accessToken);
+
+        Cookie refreshToken = new Cookie("refreshToken", loginResponseDTO.getRefreshToken());
+        refreshToken.setHttpOnly(true);
+        refreshToken.setSecure("production".equals(deployEnv));
+        response.addCookie(refreshToken);
 
         return ResponseEntity.ok(loginResponseDTO);
     }
