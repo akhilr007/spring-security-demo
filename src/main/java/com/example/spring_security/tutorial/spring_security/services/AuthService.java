@@ -1,6 +1,7 @@
 package com.example.spring_security.tutorial.spring_security.services;
 
 import com.example.spring_security.tutorial.spring_security.dto.LoginDTO;
+import com.example.spring_security.tutorial.spring_security.dto.LoginResponseDTO;
 import com.example.spring_security.tutorial.spring_security.dto.SignupDTO;
 import com.example.spring_security.tutorial.spring_security.dto.UserDTO;
 import com.example.spring_security.tutorial.spring_security.models.User;
@@ -25,6 +26,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final UserService userService;
 
     public UserDTO signup(SignupDTO signupDTO) {
         Optional<User> user = userRepository.findByEmail(signupDTO.getEmail());
@@ -39,7 +41,7 @@ public class AuthService {
 
     }
 
-    public String login(LoginDTO loginDTO) {
+    public LoginResponseDTO login(LoginDTO loginDTO) {
         Authentication authentication =
                 authenticationManager
                         .authenticate(
@@ -49,6 +51,28 @@ public class AuthService {
                         );
 
         User user = (User) authentication.getPrincipal();
-        return jwtService.generateToken(user);
+
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+        return LoginResponseDTO
+                .builder()
+                .id(user.getId())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
+    public LoginResponseDTO refreshToken(String refreshToken) {
+
+        Long userId = jwtService.getUserIdFromToken(refreshToken);
+
+        User user = userService.getUserById(userId);
+
+        String accessToken = jwtService.generateAccessToken(user);
+        return LoginResponseDTO.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 }
