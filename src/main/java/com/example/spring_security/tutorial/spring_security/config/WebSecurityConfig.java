@@ -1,5 +1,6 @@
 package com.example.spring_security.tutorial.spring_security.config;
 
+import com.example.spring_security.tutorial.spring_security.enums.Role;
 import com.example.spring_security.tutorial.spring_security.filters.JwtAuthFilter;
 import com.example.spring_security.tutorial.spring_security.handlers.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,8 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static com.example.spring_security.tutorial.spring_security.enums.Role.ADMIN;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -36,6 +39,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth ->
                     auth
                         .requestMatchers("/welcome", "/auth/**").permitAll()
+                        .requestMatchers("/messages").hasRole(ADMIN.name())
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
